@@ -1,4 +1,4 @@
-package main.br.com.jokenpo.util;
+package br.com.jokenpo.util;
 
 import java.io.*;
 import java.net.Socket;
