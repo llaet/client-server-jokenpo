@@ -1,4 +1,4 @@
-package main.br.com.jokenpo.enumeration;
+package br.com.jokenpo.enumeration;
 
 public enum ResultEnum {
 

@@ -1,8 +1,6 @@
-package main.br.com.jokenpo.server;
+package br.com.jokenpo.server;
 
-import main.br.com.jokenpo.enumeration.JokenpoEnum;
-import main.br.com.jokenpo.service.JokenpoService;
-import main.br.com.jokenpo.util.ConnectionUtil;
+import br.com.jokenpo.util.ConnectionUtil;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -11,13 +9,14 @@ import java.util.logging.Level;
 public class Server extends ConnectionUtil {
 
     private ServerSocket serverSocket;
-    private JokenpoService jokenpoService = new JokenpoService();
+    private ClientHandler[] clients = new ClientHandler[2];
 
     public Server() {
         try {
             super.setUp();
             //cria um listener para sevidor e estabelece a comunicação
             serverSocket = new ServerSocket(HOST_ADDRESS);
+            serverSocket.setReuseAddress(true);
         } catch (IOException ioe) {
             this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto estava iniciar o servidor ", ioe);
             ioe.printStackTrace();
@@ -25,52 +24,23 @@ public class Server extends ConnectionUtil {
     }
 
     public void start() {
-        boolean end = Boolean.FALSE;
+
         while(true) {
             try {
                 socket = serverSocket.accept();
-                //estabelece e escuta comunicação com servidor
-                listen();
 
-                while (true) {
+                for(int index = 0; index < 2; index++) {
 
-                    String clientMessage = bufferedReader.readLine();
+                    //estabelece e escuta comunicação com servidor
+                    listen();
 
-                    System.out.println("Cliente: " + clientMessage);
-
-                    JokenpoEnum messageJokenpoMoveEnum = JokenpoEnum.toEnum(clientMessage);
-
-                    if (messageJokenpoMoveEnum != null) {
-                        int[] result = this.jokenpoService.play(messageJokenpoMoveEnum);
-
-                        switch (result[1]) {
-                            case -1:
-                                bufferedWriter.write("Você perdeu! " + messageJokenpoMoveEnum.getMoveName()
-                                        + " X " + JokenpoEnum.toMoveName(result[0]));
-                                break;
-                            case 0:
-                                bufferedWriter.write("Empate! " + messageJokenpoMoveEnum.getMoveName()
-                                        + " X " + JokenpoEnum.toMoveName(result[0]));
-                                break;
-                            case 1:
-                                bufferedWriter.write("Vitória! " + messageJokenpoMoveEnum.getMoveName()
-                                        + " X " + JokenpoEnum.toMoveName(result[0]));
-                                break;
-                        }
-                    }
-
-                    bufferedWriter.newLine();
-                    bufferedWriter.flush();
-
-                    if (end) {
+                    if (clients[index] == null) {
+                        clients[index] =
+                                new ClientHandler(bufferedReader, bufferedWriter, clients);
+                        new Thread(clients[index]).start();
                         break;
                     }
                 }
-                socket.close();
-                inputReader.close();
-                outputWriter.close();
-                bufferedWriter.close();
-                bufferedReader.close();
 
             } catch (IOException ioe) {
                 this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto " +

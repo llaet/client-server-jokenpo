@@ -1,7 +1,6 @@
-package main.br.com.jokenpo.client;
+package br.com.jokenpo.client;
 
-import main.br.com.jokenpo.util.ConnectionUtil;
-
+import br.com.jokenpo.util.ConnectionUtil;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.logging.Level;
@@ -20,15 +19,17 @@ public class Client extends ConnectionUtil {
             //estabelece e escuta comunicação com servidor
             listen();
 
+            Messaging messaging = new Messaging(bufferedReader);
+            new Thread(messaging).start();
+
             while (true) {
                 String message = scanner.nextLine();
 
                 bufferedWriter.write(message);
                 bufferedWriter.newLine();
                 bufferedWriter.flush();
-
-                System.out.println(bufferedReader.readLine());
             }
+
         } catch (IOException ioe) {
             this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto estava enviando mensagem ", ioe);
             ioe.printStackTrace();
@@ -57,5 +58,6 @@ public class Client extends ConnectionUtil {
         Client client = new Client();
         client.start();
     }
+
 
 }
