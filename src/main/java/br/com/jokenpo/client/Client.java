@@ -1,13 +1,18 @@
 package br.com.jokenpo.client;
 
 import br.com.jokenpo.util.ConnectionUtil;
+import br.com.jokenpo.view.JokenpoClientPane;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.logging.Level;
+import java.util.Scanner;
+//import java.util.logging.Level;
 
 public class Client extends ConnectionUtil {
+    
+    private JokenpoClientPane pane;
 
-    public Client() {
+    public Client(JokenpoClientPane pane) {
+        this.pane = pane;
         super.setUp();
     }
 
@@ -19,19 +24,28 @@ public class Client extends ConnectionUtil {
             //estabelece e escuta comunicação com servidor
             listen();
 
-            Messaging messaging = new Messaging(bufferedReader);
+            Messaging messaging = new Messaging(bufferedReader,pane);
             new Thread(messaging).start();
 
-            while (true) {
-                String message = scanner.nextLine();
-
-                bufferedWriter.write(message);
-                bufferedWriter.newLine();
-                bufferedWriter.flush();
-            }
-
         } catch (IOException ioe) {
-            this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto estava enviando mensagem ", ioe);
+            //this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto estava enviando mensagem ", ioe);
+            ioe.printStackTrace();
+        }
+    }
+    
+    public void writeMessage(String message) {
+        try {
+        	Scanner scanner = new Scanner(System.in);
+        	while(true) {
+        		
+            bufferedWriter.write(message);
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+            
+            message = scanner.nextLine();
+        	}
+        } catch (IOException ioe) {
+            //this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto estava enviando mensagem ", ioe);
             ioe.printStackTrace();
         } finally {
             try {
@@ -53,11 +67,4 @@ public class Client extends ConnectionUtil {
             } catch (IOException ioe) {}
         }
     }
-
-    public static void main(String[] args) {
-        Client client = new Client();
-        client.start();
-    }
-
-
 }
