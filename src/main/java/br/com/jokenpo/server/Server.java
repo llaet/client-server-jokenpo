@@ -18,7 +18,6 @@ public class Server extends ConnectionUtil {
             serverSocket = new ServerSocket(HOST_ADDRESS);
             serverSocket.setReuseAddress(true);
         } catch (IOException ioe) {
-            this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto estava iniciar o servidor ", ioe);
             ioe.printStackTrace();
         }
     }
@@ -43,8 +42,6 @@ public class Server extends ConnectionUtil {
                 }
 
             } catch (IOException ioe) {
-                this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto " +
-                        "o serviço estava ouvindo a comunicação ", ioe);
                 ioe.printStackTrace();
             }
         }

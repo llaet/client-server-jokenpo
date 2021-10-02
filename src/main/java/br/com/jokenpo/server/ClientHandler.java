@@ -7,7 +7,6 @@ import br.com.jokenpo.util.ConnectionUtil;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.logging.Level;
 
 public class ClientHandler extends ConnectionUtil implements Runnable {
 
@@ -45,11 +44,11 @@ public class ClientHandler extends ConnectionUtil implements Runnable {
                             if (this.clients[index].jokenpoService.getEntriesSize() == 2) {
                                 int[] result = this.clients[index].jokenpoService.play();
 
-                                switch (result[1]) {
+                                switch (result[0]) {
                                     case -1:
-                                        this.clients[0].bufferedWriter.write("Vitória! " + JokenpoEnum.toMoveName(result[2])
+                                        this.clients[1].bufferedWriter.write("Vitória! " + JokenpoEnum.toMoveName(result[2])
                                                 + " X " + JokenpoEnum.toMoveName(result[3]));
-                                        this.clients[1].bufferedWriter.write("Você perdeu! " + JokenpoEnum.toMoveName(result[2])
+                                        this.clients[0].bufferedWriter.write("Você perdeu! " + JokenpoEnum.toMoveName(result[2])
                                                 + " X " + JokenpoEnum.toMoveName(result[3]));
                                         break;
                                     case 0:
@@ -57,16 +56,16 @@ public class ClientHandler extends ConnectionUtil implements Runnable {
                                                 + " X " + JokenpoEnum.toMoveName(result[3]));
                                         break;
                                     case 1:
-                                        this.clients[0].bufferedWriter.write("Você perdeu! " + JokenpoEnum.toMoveName(result[2])
+                                        this.clients[1].bufferedWriter.write("Você perdeu! " + JokenpoEnum.toMoveName(result[2])
                                                 + " X " + JokenpoEnum.toMoveName(result[3]));
-                                        this.clients[1].bufferedWriter.write("Vitória! " + JokenpoEnum.toMoveName(result[2])
+                                        this.clients[0].bufferedWriter.write("Vitória! " + JokenpoEnum.toMoveName(result[2])
                                                 + " X " + JokenpoEnum.toMoveName(result[3]));
                                         break;
                                 }
                             }
+                            this.clients[index].bufferedWriter.newLine();
+                            this.clients[index].bufferedWriter.flush();
                         }
-                        this.clients[index].bufferedWriter.newLine();
-                        this.clients[index].bufferedWriter.flush();
                     }
                 }
 
@@ -81,8 +80,6 @@ public class ClientHandler extends ConnectionUtil implements Runnable {
             bufferedReader.close();
 
         } catch (IOException ioe) {
-            this.LOGGER.log(Level.SEVERE, "Erro de entrada/saída ocorreu enquanto " +
-                    "o serviço estava ouvindo a comunicação ", ioe);
             ioe.printStackTrace();
         }
     }
